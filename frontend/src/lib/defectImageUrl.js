@@ -29,6 +29,14 @@ export function resolveDefectImageUrl(imagePath) {
   const bucket = String(bucketRaw).trim() || 'defect-images';
 
   let pathPart = raw.replace(/^\/+/, '');
+  const publicStoragePrefix = 'storage/v1/object/public/';
+  const objectStoragePrefix = 'storage/v1/object/';
+  if (pathPart.startsWith(publicStoragePrefix)) {
+    pathPart = pathPart.slice(publicStoragePrefix.length);
+  } else if (pathPart.startsWith(objectStoragePrefix)) {
+    pathPart = pathPart.slice(objectStoragePrefix.length);
+  }
+
   const prefix = `${bucket}/`;
   if (pathPart.startsWith(prefix)) pathPart = pathPart.slice(prefix.length);
 

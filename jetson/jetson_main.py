@@ -109,6 +109,46 @@ def _run_flask(port):
     _app.run(host="0.0.0.0", port=port, threaded=True, use_reloader=False)
 
 
+def _clamp_severity(value):
+    # type: (object) -> float
+    try:
+        severity = float(value)
+    except (TypeError, ValueError):
+        severity = 1.0
+    return round(max(1.0, min(10.0, severity)), 1)
+
+
+def _gps_fix_label(gps):
+    # type: (dict) -> str
+    fix = gps.get("fix")
+    if fix in ("3d", "3D"):
+        return "3d"
+    if fix in ("2d", "2D"):
+        return "2d"
+    try:
+        mode = int(fix)
+    except (TypeError, ValueError):
+        mode = 0
+    if mode >= 3:
+        return "3d"
+    if mode == 2:
+        return "2d"
+    return "no_fix"
+
+
+def _milepost_from_gps(gps):
+    # type: (dict) -> str
+    return str(gps.get("milepost") or os.environ.get("DEFAULT_MILEPOST", "0+000"))
+
+
+def _rail_line_id():
+    # type: () -> int
+    try:
+        return int(os.environ.get("RAIL_LINE_ID", "1"))
+    except ValueError:
+        return 1
+
+
 # ---------------------------------------------------------------------------
 # GPS: real (gpsd) or CSV mock
 # ---------------------------------------------------------------------------
@@ -159,7 +199,7 @@ class _Dedup(object):
 # Supabase upload + FastAPI POST  (fire-and-forget thread)
 # ---------------------------------------------------------------------------
 def _upload_and_post(supabase_url, supabase_key, fastapi_url,
-                     device_id, frame, det, gps, captured_at):
+                     device_id, frame_id, frame, det, gps, captured_at):
     frame_h, frame_w = frame.shape[:2]
 
     x1, y1, x2, y2 = (int(v) for v in det["bbox"])
@@ -220,24 +260,40 @@ def _upload_and_post(supabase_url, supabase_key, fastapi_url,
             print("[detect] /detect returned {}: {}".format(
                 resp.status_code, resp.text[:120]))
             return
-        severity = int(resp.json().get("severity"))
+        severity = _clamp_severity(resp.json().get("severity"))
     except Exception as exc:
         print("[detect] POST failed: {}".format(exc))
         return
 
     # Step 3: Write full pin record directly to Supabase
     defect_type = DEFECT_TYPE_MAP.get(det["class_name"], "transverse_crack")
+    bbox = {
+        "x": x1,
+        "y": y1,
+        "width": x2 - x1,
+        "height": y2 - y1,
+        "x1": x1,
+        "y1": y1,
+        "x2": x2,
+        "y2": y2,
+        "class_name": det["class_name"],
+    }
     pin = {
+        "status":      "new",
         "device_id":   device_id,
-        "line_id":     1,
+        "line_id":     _rail_line_id(),
         "defect_type": defect_type,
         "confidence":  round(float(det["confidence"]), 4),
-        "bbox":        [x1, y1, x2 - x1, y2 - y1],
+        "frame_id":    frame_id,
+        "bbox":        bbox,
         "lat":         gps.get("lat", 0.0),
         "lon":         gps.get("lon", 0.0),
+        "milepost":    _milepost_from_gps(gps),
         "speed_mps":   gps.get("speed", None),
-        "image_path":  public_url,
+        "gps_fix":     _gps_fix_label(gps),
+        "image_path":  image_path,
         "severity":    severity,
+        "ai_verification": "Gemini severity score: {:.1f}/10".format(severity),
         "captured_at": captured_at,
     }
     try:
@@ -447,7 +503,7 @@ def main():
                                 target=_upload_and_post,
                                 args=(
                                     supabase_url, supabase_key,
-                                    fastapi_url, device_id,
+                                    fastapi_url, device_id, frame_id,
                                     frame.copy(), best, gps_snap, captured_at,
                                 ),
                                 daemon=True,

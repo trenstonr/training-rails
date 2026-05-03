@@ -24,7 +24,7 @@ export default function Topbar({ page, onTriggerCritical }) {
   return (
     <header className="topbar">
       <div className="breadcrumb">
-        <span>RailPin</span>
+        <span>Training Rails</span>
         <span className="sep">/</span>
         <strong>{PAGE_NAMES[page] || page}</strong>
       </div>

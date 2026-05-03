@@ -26,9 +26,9 @@ export default function Sidebar({ page, setPage, line, setLine }) {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="brand-mark">RP</div>
+        <div className="brand-mark">TR</div>
         <div className="brand-text">
-          <strong>RailPin</strong>
+          <strong>Training Rails</strong>
           <small>v1.0 · Beta</small>
         </div>
       </div>

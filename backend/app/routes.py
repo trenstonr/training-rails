@@ -20,6 +20,16 @@ async def health():
     return {"status": "ok"}
 
 
+@router.get("/debug/cors")
+async def debug_cors():
+    """Diagnostic-only: shows what the running server sees for CORS env."""
+    import os
+    return {
+        "CORS_ORIGINS": os.getenv("CORS_ORIGINS"),
+        "CORS_ORIGIN_REGEX": os.getenv("CORS_ORIGIN_REGEX"),
+    }
+
+
 @router.post("/detect", dependencies=[Depends(verify_api_token)])
 async def detect(defect: dict | None = None):
     if defect is None:

@@ -324,7 +324,8 @@ const RailPinMap = forwardRef(function RailPinMap(
     if (!containerRef.current || mapRef.current) return;
     const map = L.map(containerRef.current, {
       zoomControl: false,
-      attributionControl: true
+      attributionControl: true,
+      scrollWheelZoom: false
     });
     mapRef.current = map;
 

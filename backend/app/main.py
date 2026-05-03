@@ -18,10 +18,18 @@ allow_origins = [
     if o.strip()
 ]
 
+# Vercel preview deploys get a unique hash subdomain on every push
+# (e.g. training-rails-<hash>-ksavkins-projects.vercel.app), so a static
+# allowlist breaks on the next deploy. CORS_ORIGIN_REGEX lets you match
+# the whole project surface — set it on Render to e.g.
+#   ^https://training-rails(-[a-z0-9]+)?-ksavkins-projects\.vercel\.app$
+allow_origin_regex = os.getenv("CORS_ORIGIN_REGEX") or None
+
 app = FastAPI(title=APP_NAME)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allow_origins,
+    allow_origin_regex=allow_origin_regex,
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -54,7 +54,14 @@ services:
       - key: API_TOKEN
         sync: false
 
-      # Comma-separated allowlist for CORS. Must include your Vercel URL,
-      # e.g. "https://training-rails.vercel.app,https://*.vercel.app".
+      # Comma-separated allowlist for CORS. Use this for stable origins
+      # (localhost, your custom domain). Vercel preview URLs change on every
+      # push, so prefer CORS_ORIGIN_REGEX for those.
       - key: CORS_ORIGINS
+        sync: false
+
+      # Regex matching origins (overrides + complements CORS_ORIGINS).
+      # Set this to match the Vercel project surface, e.g.:
+      # ^https://training-rails(-[a-z0-9]+)?-ksavkins-projects\.vercel\.app$
+      - key: CORS_ORIGIN_REGEX
         sync: false

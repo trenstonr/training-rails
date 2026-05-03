@@ -118,17 +118,7 @@ function buildPopup(pin, onOpenDefect) {
     ) +
     statRow('Milepost', pin.mp) +
     statRow('Confidence', confStr) +
-    statRow('Captured', pin.capturedAt) +
-    statRow('Latitude', Number.isFinite(pin.lat) ? pin.lat.toFixed(6) + '°' : '') +
-    statRow('Longitude', Number.isFinite(pin.lon) ? pin.lon.toFixed(6) + '°' : '') +
-    statRow('Status', pin.status) +
-    statRow('Device', pin.deviceId) +
-    statRow('Frame ID', pin.frameId != null ? String(pin.frameId) : '') +
-    statRow('Resolved at', pin.resolvedAt) +
-    statRow('Created', pin.createdAt) +
-    statRow('Updated', pin.updatedAt) +
-    statRow('Storage path', pin.imagePath) +
-    statRow('Notes', pin.notes);
+    statRow('Captured', pin.capturedAt);
 
   wrap.innerHTML =
     preview +
@@ -199,7 +189,13 @@ function addPins(map, pinList, onOpenDefect) {
   const dataMap = new Map();
   pinList.forEach((pin) => {
     const marker = L.marker([pin.lat, pin.lon], { icon: makeDefectPinIcon(pin, false) }).addTo(map);
-    marker.bindPopup(buildPopup(pin, onOpenDefect), { closeButton: false, offset: [0, -18] });
+    marker.bindPopup(buildPopup(pin, onOpenDefect), {
+      closeButton: false,
+      offset: [0, -18],
+      autoPan: false,
+      keepInView: false,
+      maxWidth: 220
+    });
     marker.off('click');
     marker.on('click', () => onOpenDefect?.(pin));
     let closeTimer = null;
@@ -489,7 +485,13 @@ const RailPinMap = forwardRef(function RailPinMap(
         icon: makeDefectPinIcon(FOCUS_PIN, { isNewDrop: true })
       }).addTo(map);
       m.on('click', () => onOpenDefectRef.current?.(FOCUS_PIN));
-      m.bindPopup(buildPopup(FOCUS_PIN, (pin) => onOpenDefectRef.current?.(pin)), { closeButton: false, offset: [0, -18] });
+      m.bindPopup(buildPopup(FOCUS_PIN, (pin) => onOpenDefectRef.current?.(pin)), {
+        closeButton: false,
+        offset: [0, -18],
+        autoPan: false,
+        keepInView: false,
+        maxWidth: 220
+      });
       demoMarkerRef.current = m;
       map.setView([FOCUS_PIN.lat, FOCUS_PIN.lon], 11, { animate: true });
     }
@@ -504,3 +506,4 @@ const RailPinMap = forwardRef(function RailPinMap(
 });
 
 export default RailPinMap;
+

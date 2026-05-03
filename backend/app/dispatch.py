@@ -11,7 +11,7 @@ def dispatch_operator(payload: dict) -> dict:
 
     return {
         "status": "sent",
-        "message_sid": sms.message_sid,
+        "message_id": sms.message_id,
         "sms_status": sms.status,
         "to": sms.to,
     }

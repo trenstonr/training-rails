@@ -15,7 +15,7 @@ Training Rails uses a train-mounted camera and a custom-trained YOLO computer vi
 │  (Trained)   │     │  (Jetson)   │      │  (FastAPI)  │      │ React/Vite  │
 └──────────────┘     └─────────────┘      └─────────────┘      └─────────────┘
       │                    │                     │                    │
- Defect Detection     Camera + GPS        Supabase + SMS         Google Maps
+ Defect Detection     Camera + GPS        Supabase + SMS          leaflet.js
 ```
 
 - **YOLO Model**: Custom-trained rail-defect detector for cracks, squats, flaking, and surface damage

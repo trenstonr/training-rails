@@ -7,6 +7,12 @@ Automated rail defect detection platform.
 
 Training Rails uses a train-mounted camera and a custom-trained YOLO computer vision model to detect rail defects, place them on an inspector dashboard, and send urgent SMS alerts when operator attention is needed.
 
+<p align="center">
+  <img width="322" height="341" alt="Training Rails hardware setup" src="https://github.com/user-attachments/assets/044ef13e-0f75-40fd-bf00-9185cf360761" />
+  <br>
+  <em>NVIDIA Jetson TX2 + Logitech HD Pro Webcam C920 + Stratux GPS 2.0</em>
+</p>
+
 ## Architecture
 
 ```text

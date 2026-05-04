@@ -48,13 +48,12 @@ Live Demo Slides: https://docs.google.com/presentation/d/1vxT7ZXQkkmtJf2FVLyoud-
 
 Training Rails uses a custom-trained YOLO object detection model for rail defect recognition. The model identifies visual defects from camera frames so inspectors can review likely problem areas instead of manually scanning raw footage.
 
-Target defect categories include:
-
-- Cracks
-- Squats
-- Flaking
-- Surface damage
-- Other visible rail defects
+<p align="center">
+<img width="368" height="358" alt="Screenshot 2026-05-03 181045" src="https://github.com/user-attachments/assets/af23c98d-b56e-41c0-9f38-d33a2d709a34" />
+  <br>
+  <em>Live Demo Model Output
+</em>
+</p>
 
 ## Core Features
 

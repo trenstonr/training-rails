@@ -2,7 +2,7 @@
 
 Automated rail defect detection platform.
 
-**BeaverHacks 2026 - Hardware Track**  
+**BeaverHacks 2026 - Hardware Track (Winner)**  
 **Team:** Chris Ho, James Tappert, Konstantin Savkin, Trenston Ricks
 
 Training Rails uses a train-mounted camera and a custom-trained YOLO computer vision model to detect rail defects, place them on an inspector dashboard, and send urgent SMS alerts when operator attention is needed.
@@ -15,7 +15,7 @@ Training Rails uses a train-mounted camera and a custom-trained YOLO computer vi
 │  (Trained)   │     │  (Jetson)   │      │  (FastAPI)  │      │ React/Vite  │
 └──────────────┘     └─────────────┘      └─────────────┘      └─────────────┘
       │                    │                     │                    │
- Defect Detection     Camera + GPS        Supabase + SMS         Google Maps
+ Defect Detection     Camera + GPS        Supabase + SMS          leaflet.js
 ```
 
 - **YOLO Model**: Custom-trained rail-defect detector for cracks, squats, flaking, and surface damage

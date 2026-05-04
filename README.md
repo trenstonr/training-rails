@@ -2,7 +2,7 @@
 
 Automated rail defect detection platform.
 
-**BeaverHacks 2026 - Hardware Track**  
+**BeaverHacks 2026 - Hardware Track (Winner)**  
 **Team:** Chris Ho, James Tappert, Konstantin Savkin, Trenston Ricks
 
 Training Rails uses a train-mounted camera and a custom-trained YOLO computer vision model to detect rail defects, place them on an inspector dashboard, and send urgent SMS alerts when operator attention is needed.

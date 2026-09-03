@@ -144,9 +144,10 @@ const FALLBACK_PINS_BASE = [
   { id: 'DEF-04934', line: '4', sev: 'med',  type: 'Shelling',        lat: 47.290, lon: -122.420, mp: '38+040', conf: 0.72, capturedAt: '2026-04-29 12:15:44' }
 ];
 
-export const FALLBACK_PINS = FALLBACK_PINS_BASE.map((pin) => ({
+export const FALLBACK_PINS = FALLBACK_PINS_BASE.map((pin, i) => ({
   ...pin,
-  type: displayDefectCategory(pin.type, pin.id)
+  type: displayDefectCategory(pin.type, pin.id),
+  imageUrl: `/defect_${String((i % 8) + 1).padStart(2, '0')}.jpg`
 }));
 
 export const FOCUS_PIN = {
@@ -176,21 +177,19 @@ export const CAMERAS = [
   }
 ];
 
+// Key-free raster providers only. CartoDB basemaps now watermark tiles with
+// "API KEY REQUIRED" unless a Carto key is supplied, so OSM is used with a
+// CSS dark filter (see .tiles-dark in index.css) to keep the dark UI.
 export const TILE_PROVIDERS = [
   {
-    name: 'CartoDB Dark Matter',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-    options: { attribution: '© OSM · © CartoDB', subdomains: 'abcd', maxZoom: 19 }
-  },
-  {
-    name: 'Stadia Dark',
-    url: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png',
-    options: { attribution: '© Stadia · © OSM', maxZoom: 20 }
-  },
-  {
-    name: 'OpenStreetMap',
+    name: 'OpenStreetMap (dark)',
     url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    options: { attribution: '© OSM', maxZoom: 19 }
+    options: { attribution: '© OpenStreetMap contributors', maxZoom: 19, className: 'tiles-dark' }
+  },
+  {
+    name: 'OpenStreetMap DE (dark)',
+    url: 'https://tile.openstreetmap.de/{z}/{x}/{y}.png',
+    options: { attribution: '© OpenStreetMap contributors', maxZoom: 18, className: 'tiles-dark' }
   }
 ];
 

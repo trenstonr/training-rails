@@ -8,6 +8,7 @@ import {
 import { FALLBACK_PINS } from '../data/railData.js';
 
 const TABLE = 'pins';
+const PROVISIONAL_FALLBACK_MS = 3000;
 
 function applyRealtimePayload(prevPins, payload) {
   const { eventType, new: nextRow, old: prevRow } = payload;
@@ -73,35 +74,54 @@ export function useRailPins(options = {}) {
     }
 
     let cancelled = false;
+    let channel = null;
+    let remoteOk = false;
+    let channelErrored = false;
+    const REALTIME_ERR = 'Realtime channel error — enable Realtime for table `pins` in Supabase.';
 
     async function load() {
       setStatus('loading');
       setError(null);
+      // A dead/paused project can hang the request for many seconds; show demo
+      // pins meanwhile so the map is never empty. Real rows replace them on success.
+      const provisional = setTimeout(() => {
+        if (cancelled || remoteOk) return;
+        setPins((prev) => (prev.length ? prev : FALLBACK_PINS));
+        setStatus('local');
+      }, PROVISIONAL_FALLBACK_MS);
       const { data, error: fetchError } = await client
         .from(TABLE)
         .select('*')
         .order('captured_at', { ascending: false });
+      clearTimeout(provisional);
 
       if (cancelled) return;
 
       if (fetchError) {
-        console.warn('[useRailPins]', fetchError.message, fetchError);
-        setError(
-          `${fetchError.message} — check RLS policies (SELECT for anon) and that the table is public.pins.`
+        // Supabase unreachable (paused/deleted project, DNS, RLS): keep the demo
+        // usable by falling back to bundled pins instead of an empty red map.
+        console.warn(
+          `[useRailPins] ${fetchError.message} — falling back to demo pins. ` +
+            'Check the Supabase project, RLS (SELECT for anon) and that the table is public.pins.',
+          fetchError
         );
-        setPins([]);
-        setStatus('error');
+        if (channel) client.removeChannel(channel);
+        setPins(FALLBACK_PINS);
+        setError(null);
+        setStatus('local');
         return;
       }
 
       const mapped = (data ?? []).map(rowToPin);
+      remoteOk = true;
       setPins(sortPinsByCapturedAtDesc(mapped));
       setStatus('remote');
+      if (channelErrored) setError((prev) => prev || REALTIME_ERR);
     }
 
     load();
 
-    const channel = client
+    channel = client
       .channel(`realtime:${TABLE}`)
       .on(
         'postgres_changes',
@@ -124,7 +144,10 @@ export function useRailPins(options = {}) {
       .subscribe((subStatus, subErr) => {
         if (subErr) console.warn('[useRailPins] realtime', subErr.message);
         if (subStatus === 'CHANNEL_ERROR') {
-          setError((prev) => prev || 'Realtime channel error — enable Realtime for table `pins` in Supabase.');
+          channelErrored = true;
+          // Only surface the banner once we know the REST side works; if the
+          // project is unreachable we fall back to demo pins silently instead.
+          if (remoteOk) setError((prev) => prev || REALTIME_ERR);
         }
       });
 
